@@ -970,10 +970,13 @@ class Test_Workflow_Convergence(APITest):
         n3_dnr = factories.workflow_job_template_node(
             workflow_job_template=wfjt, unified_job_template=jt)
         convergence_node = factories.workflow_job_template_node(
-            workflow_job_template=wfjt, unified_job_template=jt)
-        # Assert that convergence is set to "ANY" by default
-        assert not convergence_node.all_parents_must_converge
-        convergence_node.all_parents_must_converge = True # set it to "ALL"
+            workflow_job_template=wfjt, unified_job_template=jt, all_parents_must_converge=True)
+        assert convergence_node.all_parents_must_converge
+        # Assert that convergence is set to False by default,
+        # which means if "ANY" of the parents would trigger it then it will run
+        assert not n0_success.all_parents_must_converge
+
+        # set convergence to True, which means "ALL" parents must converge for the node to run
         parent_nodes = []
 
         # Associate convergence node with it's parents depending upon the scenario
@@ -1023,16 +1026,16 @@ class Test_Workflow_Convergence(APITest):
             assert not convergence_workflow_job_node.do_not_run
 
         # Assert that all parent jobs ended before convergence node started
-        nodes_still_running_when_convergence_job_started = []
-        for parent_node_and_name in parent_nodes:
-            parent = parent_node_and_name[0]
-            description = parent_node_and_name[1]
-            parent_job_node = get_job_node(wfj, parent.id, mapping)
-            if not parent_job_node.do_not_run:
-                parent_job = parent_job_node.related['job'].get()
-                # if convergence job started before its parent finished,
-                # that is a problem
-                if not convergence_workflow_job_node.do_not_run:
+        if not convergence_workflow_job_node.do_not_run:
+            nodes_still_running_when_convergence_job_started = []
+            for parent_node_and_name in parent_nodes:
+                parent = parent_node_and_name[0]
+                description = parent_node_and_name[1]
+                parent_job_node = get_job_node(wfj, parent.id, mapping)
+                if not parent_job_node.do_not_run:
+                    parent_job = parent_job_node.related['job'].get()
+                    # if convergence job started before its parent finished,
+                    # that is a problem
                     convergence_job = get_job_node(
                         wfj, convergence_node.id, mapping).related['job'].get()
                     convergence_job.assert_successful()
@@ -1041,7 +1044,7 @@ class Test_Workflow_Convergence(APITest):
                             'convergence_node started at {0} which is before parent_job end time {1}, parent job was {2} '.format(
                                 convergence_job.started, parent_job.finished, description))
 
-        if nodes_still_running_when_convergence_job_started:
-            raise AssertionError(
-                'Convergence node started before parent job finisheds. Errors were:\n{}'.format(
-                    '\n'.join(nodes_still_running_when_convergence_job_started)))
+            if nodes_still_running_when_convergence_job_started:
+                raise AssertionError(
+                    'Convergence node started before parent job finisheds. Errors were:\n{}'.format(
+                        '\n'.join(nodes_still_running_when_convergence_job_started)))
