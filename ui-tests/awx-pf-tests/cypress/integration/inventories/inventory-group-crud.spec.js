@@ -9,6 +9,9 @@ context('Create an Inventory group', function() {
 
   it('can create an inventory group', function() {
     cy.visit(`/#/inventories/inventory/${this.inv.id}`)
+    cy.get('[class*="pf-c-card"]').within(() => {
+      cy.contains('Loading').should('not.exist')
+    })
     cy.get('button[aria-label="Groups"]').click()
     cy.get('.pf-c-empty-state .pf-c-title').should('have.text', 'No Items Found')
     cy.get('[aria-label="Add"]').click()
@@ -35,6 +38,9 @@ context('Edit an Inventory group', function() {
 
   it('can edit an inventory group', function() {
     cy.visit(`/#/inventories/inventory/${this.inv.id}`)
+    cy.get('[class*="pf-c-card"]').within(() => {
+      cy.contains('Loading').should('not.exist')
+    })
     cy.get('button[aria-label="Groups"]').click()
     cy.get('input[aria-label*="Search text input"]').type(`${this.inv_group.name}{enter}`)
     cy.get(`a[href*="groups/${this.inv_group.id}/edit"]`).click()
@@ -63,6 +69,9 @@ context('Delete an Inventory group', function() {
 
   it('can delete an inventory group', function() {
     cy.visit(`/#/inventories/inventory/${this.inv.id}`)
+    cy.get('[class*="pf-c-card"]').within(() => {
+      cy.contains('Loading').should('not.exist')
+    })
     cy.get('button[aria-label="Groups"]').click()
     cy.get('input[aria-label*="Search text input"]').type(`${this.inv_group.name}{enter}`)
     cy.get('[aria-label="close"]')

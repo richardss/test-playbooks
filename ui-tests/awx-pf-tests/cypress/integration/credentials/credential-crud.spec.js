@@ -137,28 +137,28 @@ context('Credential Lists', function() {
     })
     it('Can toggle the amount of visible items in the credential list', function() {
       // 5 visible items
-      cy.get('#pagination-options-menu-toggle').click()
+      cy.get('[id*="pagination-options-menu-toggle"]').click()
       cy.get('[data-action="per-page-5"]').click()
       cy.get('[aria-label="Items List"]')
         .find('li')
         .should('have.length', 5)
 
       // 10 visible items
-      cy.get('#pagination-options-menu-toggle').click()
+      cy.get('[id*="pagination-options-menu-toggle"]').click()
       cy.get('[data-action="per-page-10"]').click()
       cy.get('[aria-label="Items List"]')
         .find('li')
         .should('have.length', 10)
 
       // 20 visible items
-      cy.get('#pagination-options-menu-toggle').click()
+      cy.get('[id*="pagination-options-menu-toggle"]').click()
       cy.get('[data-action="per-page-20"]').click()
       cy.get('[aria-label="Items List"]')
         .find('li')
         .should('have.length', 20)
 
       // Only 21 items available, so expect 21
-      cy.get('#pagination-options-menu-toggle').click()
+      cy.get('[id*="pagination-options-menu-toggle"]').click()
       cy.get('[data-action="per-page-50"]').click()
       cy.get('[aria-label="Items List"]')
         .find('li')

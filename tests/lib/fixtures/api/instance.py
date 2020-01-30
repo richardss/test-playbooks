@@ -34,10 +34,10 @@ def instance_group(request, authtoken, is_traditional_cluster, is_openshift_clus
     under test is a traditional cluster and includes isolated nodes.
     """
     if request.param == 'isolated':
-        if is_traditional_cluster or is_openshift_cluster:
+        if is_traditional_cluster:
             return v2.instance_groups.get(name='protected').results.pop()
         else:
-            pytest.skip("Not on a cluster, cannot run on isolated node.")
+            pytest.skip("Not on a traditional cluster, cannot run on isolated node.")
     if request.param == 'regular':
         return v2.instance_groups.get(name='tower').results.pop()
     if request.param == 'container_group':
